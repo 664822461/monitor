@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="foodie-dev-api" />
+        <module name="foodie-dev-common" />
+        <module name="foodie-dev-mapper" />
+        <module name="foodie-dev-pojo" />
+        <module name="foodie-dev-service" />
+        <module name="foodiedev-pojo" />
+        <module name="monitor-data" />
+        <module name="trade-union" />
+        <module name="tradeunion" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="foodie-dev" target="1.8" />
+      <module name="foodie-dev-api" target="1.8" />
+      <module name="foodie-dev-common" target="1.8" />
+      <module name="foodie-dev-mapper" target="1.8" />
+      <module name="foodie-dev-pojo" target="1.8" />
+      <module name="foodie-dev-service" target="1.8" />
+      <module name="foodiedev-pojo" target="1.8" />
+      <module name="monitor-data" target="1.8" />
+      <module name="mybatis-generator-for-imooc" target="1.5" />
+      <module name="trade-union" target="1.8" />
+      <module name="tradeunion" target="1.5" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

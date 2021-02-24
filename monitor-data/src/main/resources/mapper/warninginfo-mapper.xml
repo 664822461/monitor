@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.maigechuang.mapper.caiji.WarningInfoMapper">
+
+    <insert id="insertWarningInfo" parameterType="com.maigechuang.entity.WarningInfo">
+        insert into warning_info(tid,level,created_time,update_time,is_handle,wait_day,temp_time) values (#{tid},#{level},#{createdTime},#{updateTime},#{isHandle},#{waitDay},#{tempTime});
+    </insert>
+    
+    <select id="findWarningInfoByTid" parameterType="int" resultType="com.maigechuang.entity.WarningInfo">
+
+          select top 1 id,tid
+      ,level
+      ,created_time
+      ,update_time
+      ,status
+      ,is_handle from [JK2018].[dbo].[warning_info] where tid = #{tid} order by created_time desc
+
+    </select>
+
+
+    <update id="updateWarnInfoById">
+          update [JK2018].[dbo].[warning_info] set Created_time = #{time}  where id = #{id}
+    </update>
+
+
+    <select id="getCountByDate" resultType="int">
+
+
+        select count(1) from [JK2018].[dbo].[warning_info] where temp_time >= #{endTime}
+
+
+    </select>
+
+    <select id="getAllCount" resultType="int">
+        select count(1) from [JK2018].[dbo].[warning_info] where is_handle = 0
+    </select>
+
+    <update id="updateWaitDay">
+          update [JK2018].[dbo].[warning_info] set wait_day = wait_day+1 where id = #{id}
+    </update>
+
+
+    <select id="findAllInfo" resultType="com.maigechuang.entity.vo.WariningDataVO">
+select top (#{size}) w.id as id,
+n.area,
+n.source_web_site as SourceWebSite,
+n.source_info as SourceInfo
+      ,w.level as level
+      ,w.created_time as CreatedTime
+      ,w.is_handle as isHandle,
+      w.wait_day as waitDay,
+      w.beizhu as beizhu
+      from [JK2018].[dbo].[warning_info] w left join [JK2018].[dbo].news_source n on
+      w.tid = n.id  where  w.is_handle = 0 and w.id
+      not in
+      ( select top ((#{page}-1)*(#{size})) id from [JK2018].[dbo].[warning_info] where  is_handle = 0 order by level) order by level
+
+    </select>
+
+
+    <update id="updateHandlerById">
+        update  [JK2018].[dbo].[warning_info] set is_handle = 1,update_time = #{time}  where id = #{id}
+    </update>
+
+
+    <update id="updatebeizhuByid">
+        update  [JK2018].[dbo].[warning_info] set beizhu = #{beizhu} where id = #{id}
+    </update>
+
+    <delete id="deleteWarningByTid">
+        delete from [JK2018].[dbo].[warning_info] where Tid = #{id}
+    </delete>
+
+</mapper>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.maigechuang.mapper.caiji.NewsOplogMapper">
+
+
+
+    <sql id = "insertFields">
+       user_ip,text,op_time
+    </sql>
+    <sql id = "selectFields">
+        user_ip,text,op_time
+    </sql>
+
+
+    <select id = "getNewsLogList" resultType="com.maigechuang.entity.NewsOplog">
+        select top 10 <include refid="selectFields"></include>
+        from news_oplog order by id DESC
+    </select>
+
+
+    <insert id="insertlog" parameterType="com.maigechuang.entity.NewsOplog">
+        insert into news_oplog (<include refid="insertFields"></include>)
+        values (#{userIp},#{text},#{opTime})
+    </insert>
+
+</mapper>

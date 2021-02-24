@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html class="x-admin-sm" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="stylesheet" th:href="@{/css/font.css}">
+    <link rel="stylesheet" th:href="@{/css/xadmin.css}">
+
+    <script th:src="@{/lib/layui/layui.js}" charset="utf-8"></script>
+    <script type="text/javascript" th:src="@{/js/xadmin.js}"></script>
+    <!--[if lt IE 9]>
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+
+
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+
+        <div class="layui-col-sm6 layui-col-md3">
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    昨日采集标讯
+                    <span class="layui-badge layui-bg-blue layuiadmin-badge">日</span>
+                </div>
+                <div class="layui-card-body layuiadmin-card-list">
+                    <p class="layuiadmin-big-font"><h1 id = "yesData">0</h1></p>
+                    <p>
+                        相较前日
+                        <span class="layuiadmin-span-color"><span id = "yesDataScale">增长0%</span> <i class="layui-inline layui-icon layui-icon-face-smile-b"></i></span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-sm6 layui-col-md3">
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    昨日有效标讯
+
+                    <span class="layui-badge layui-bg-green layuiadmin-badge">效</span>
+                </div>
+                <div class="layui-card-body layuiadmin-card-list">
+                    <p class="layuiadmin-big-font"><h1 id = "efvData">0</h1></p>
+                    <p>
+                        相较前日
+                        <span class="layuiadmin-span-color"><span id = "efvDataScale">增长0%</span> <i class="layui-inline layui-icon layui-icon-face-smile-b"></i></span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-sm6 layui-col-md3">
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    新增监测采集源
+                    <span class="layui-badge layui-bg-blue layuiadmin-badge">增</span>
+                </div>
+                <div class="layui-card-body layuiadmin-card-list">
+
+                    <p class="layuiadmin-big-font"><h1 id = "addNews">0</h1></p>
+                    <p>
+                        总监测采集源
+                        <span class="layuiadmin-span-color"><span id = "newsCount">0</span> <i class="layui-inline layui-icon layui-icon-face-smile-b"></i></span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-sm6 layui-col-md3">
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    新增预警信息
+                    <span class="layui-badge layui-bg-orange layuiadmin-badge">警</span>
+                </div>
+                <div class="layui-card-body layuiadmin-card-list">
+
+                    <p class="layuiadmin-big-font"><h1 id = "monitorData">0</h1></p>
+                        待处理任务
+                    <span class="layuiadmin-span-color" style="color: #FD482C;font-size: 15px" id = "monitorDataCount">50</span>
+
+                </div>
+            </div>
+        </div>
+
+
+
+
+        <div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+
+        <div class="layui-col-sm12 layui-col-md6">
+            <div class="layui-card">
+                <div class="layui-card-header">近七天--采集数量变化</div>
+                <div class="layui-card-body" style="min-height: 280px;">
+                    <div id="main1" class="layui-col-sm12" style="height: 300px;"></div>
+
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-sm12 layui-col-md6">
+            <div class="layui-card">
+                <div class="layui-card-header">已监测采集源昨日top</div>
+                <div class="layui-card-body" style="min-height: 280px;">
+                    <div id="main3" class="layui-col-sm12" style="height: 300px;"></div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.bootcss.com/echarts/4.2.1-rc1/echarts.min.js"></script>
+<script type="text/javascript">
+
+
+
+
+
+
+
+    var myChart = echarts.init(document.getElementById('main1'));
+    // 基于准备好的dom，初始化echarts实例
+    var myChart2 = echarts.init(document.getElementById('main3'));
+
+    layui.use('table', function() {
+        $ = layui.jquery;
+        $.get("/monitor/toplist", function (resp) {
+            var dates = new Array();
+            var datalist = new Array();
+
+            for (var i = 0; i < resp.length; i++) {
+                var item = resp[i];
+                dates[i] = item.date;
+                var datas = new Object();
+                datas['name'] = item.date;
+                datas['value'] = item.total;
+                datalist.push(datas);
+            }
+            // 指定图表的配置项和数据
+            var option2 = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b} : {c} ({d}%)"
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left',
+                    data: dates
+                },
+                series: [
+                    {
+                        name: '访问来源',
+                        type: 'pie',
+                        radius: '55%',
+                        center: ['50%', '60%'],
+                        data: datalist,
+                        itemStyle: {
+                            emphasis: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            }
+            myChart2.setOption(option2);
+
+        });
+
+        $.get("/note/main1", function (resp) {
+            var dates = new Array();
+            var totals = new Array();
+
+            for (var i = 0; i < resp.length; i++) {
+                var item = resp[i];
+                dates[i] = item.date;
+                totals[i] = item.total;
+            }
+                // 指定图表的配置项和数据
+                var option = {
+                    grid: {
+                        top: '5%',
+                        right: '1%',
+                        left: '1%',
+                        bottom: '10%',
+                        containLabel: true
+                    },
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+                    xAxis: {
+                        type: 'category',
+                        data: dates.reverse()
+                    },
+                    yAxis: {
+                        type: 'value'
+                    },
+                    series: [{
+                        name:'增加量',
+                        data: totals.reverse(),
+                        type: 'line',
+                        smooth: true
+                    }]
+                };
+
+
+
+
+            myChart.setOption(option);
+        });
+
+
+
+
+
+        $.get("/collect/indexshow", function (resp) {
+
+            $("#yesData").html( resp.yesData);
+            $("#yesDataScale").html( resp.yesDataScale);
+            $("#efvData").html( resp.efvData);
+            $("#efvDataScale").html( resp.efvDataScale);
+            $("#addNews").html( resp.addNews);
+            $("#newsCount").html( resp.newsCount);
+            $("#monitorData").html( resp.monitorData);
+            $("#monitorDataCount").html( resp.monitorDataCount);
+
+
+
+
+
+
+
+
+        });
+
+
+
+
+    });
+
+
+
+
+
+
+
+
+
+</script>
+
+
+
+<script>
+    var _hmt = _hmt || [];
+    (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?b393d153aeb26b46e9431fabaf0f6190";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+</body>
+</html>

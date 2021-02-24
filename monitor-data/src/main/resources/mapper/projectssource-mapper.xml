@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.maigechuang.mapper.caiji.ProjectsSourceMapper">
+
+    <select id="findCountByName" resultType="int">
+        select count(1) from [JK].[dbo].[ProjectsSource] where Department = #{name} and
+        CreatedOn &gt;= #{startTime} and  CreatedOn &lt; #{endTime}
+    </select>
+
+    <select id="findyesData" resultType="int">
+
+        SELECT COUNT(1)
+        FROM [JK].[dbo].[ProjectsSource] where  CreatedOn &gt;= #{startTime} and  CreatedOn &lt; #{endTime}
+    </select>
+
+    <select id="beforeyesData" resultType="int">
+
+        SELECT COUNT(1)
+        FROM [JK].[dbo].[ProjectsSource] where  CreatedOn &gt;= #{startTime} and  CreatedOn &lt; #{endTime}
+    </select>
+
+    <select id="findeyesfvData" resultType="int">
+        /****** Script for SelectTopNRows command from SSMS  ******/
+        SELECT COUNT(1)
+        FROM [JK].[dbo].[ProjectsSource] where ( CreatedOn &gt;= #{startTime} and  CreatedOn &lt; #{endTime}) and Remark != '重复'
+    </select>
+
+    <select id="beforeyesefvData" resultType="int">
+        /****** Script for SelectTopNRows command from SSMS  ******/
+        SELECT COUNT(1)
+        FROM [JK].[dbo].[ProjectsSource] where ( CreatedOn &gt;= #{startTime} and  CreatedOn &lt; #{endTime}) and Remark != '重复'
+    </select>
+
+
+
+
+</mapper>

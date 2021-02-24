@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html class="x-admin-sm" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>数据详情页</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="stylesheet" th:href="@{/css/font.css}">
+    <link rel="stylesheet" th:href="@{/css/xadmin.css}">
+    <script th:src="@{/lib/layui/layui.js}" charset="utf-8"></script>
+    <script type="text/javascript" th:src="@{/js/xadmin.js}"></script>
+    <!--[if lt IE 9]>
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body >
+<div class="layui-col-sm12 layui-col-md6">
+    <div class="layui-card">
+        <div class="layui-card-header">最近十天--【<span id = "cjname" th:text="${cjname}"></span>】抓取数量</div>
+        <div class="layui-card-body" style="min-height: 280px;">
+            <div id="main1" class="layui-col-sm12" style="height: 300px;"></div>
+
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.bootcss.com/echarts/4.2.1-rc1/echarts.min.js"></script>
+
+<script th:inline="text">
+
+    layui.use('table', function() {
+        $ = layui.jquery;
+        var cjname = '[[${cjname}]]';
+        var myChart = echarts.init(document.getElementById('main1'));
+        console.log(cjname+"sssss");
+        $.get("/readData?cjname="+cjname, function (resp) {
+            var dates = new Array();
+            var totals = new Array();
+
+            for (var i = 0; i < resp.length; i++) {
+                var item = resp[i];
+                dates[i] = item.time;
+                totals[i] = item.total;
+            }
+
+            option = {
+                color: ['#3398DB'],
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                        type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: dates,
+                        axisTick: {
+                            alignWithLabel: true
+                        }
+                    }
+                ],
+                yAxis: [
+                    {
+                        type: 'value'
+                    }
+                ],
+                series: [
+                    {
+                        name: '抓取数量',
+                        type: 'bar',
+                        barWidth: '60%',
+                        data: totals
+                    }
+                ]
+            };
+            myChart.setOption(option);
+        });
+
+
+
+    });
+
+
+</script>
+</body>
+</html>

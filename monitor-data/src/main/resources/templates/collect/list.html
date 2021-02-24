@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html class="x-admin-sm" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.2</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="stylesheet" th:href="@{/css/font.css}">
+    <link rel="stylesheet" th:href="@{/css/xadmin.css}">
+    <script th:src="@{/lib/layui/layui.js}" charset="utf-8"></script>
+    <script type="text/javascript" th:src="@{/js/xadmin.js}"></script>
+</head>
+
+<body>
+<div class="x-nav">
+          <span class="layui-breadcrumb">
+            <a href="">首页</a>
+            <a href="">采集源管理</a>
+            <a>
+              <cite>采集源列表</cite></a>
+          </span>
+    <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" th:href="@{/collect/list}" title="刷新">
+        <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i></a>
+</div>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-body ">
+                    <form class="layui-form layui-col-space5" th:action="@{/collect/list}">
+
+                        <div class="layui-input-inline layui-show-xs-block">
+                            <input type="text" name="searchArea" placeholder="请输入地区" autocomplete="off" class="layui-input" th:value="${searchArea}"></div>
+
+                        <div class="layui-input-inline layui-show-xs-block">
+                            <input type="text" name="searchName" placeholder="请输入采集源名称" autocomplete="off" class="layui-input" th:value="${searchName}"></div>
+
+                        <div class="layui-input-inline layui-show-xs-block">
+                            <input type="text" name="searchAddress" placeholder="请输入采集源网址" autocomplete="off" class="layui-input" th:value="${searchAddress}"></div>
+
+                        <div class="layui-input-inline layui-show-xs-block">
+                            <select name="searchType">
+                                <option value="0" th:selected="${searchType}==0">类别</option>
+                                <option value="1" th:selected="${searchType}==1">人民政府</option>
+                                <option value="2" th:selected="${searchType}==2">公共资源&政府采购</option>
+                                <option value="3" th:selected="${searchType}==3">运营商</option>
+                                <option value="4" th:selected="${searchType}==4">高校</option>
+                                <option value="5" th:selected="${searchType}==5">城乡建设局</option>
+                                <option value="6" th:selected="${searchType}==6">其他</option>
+                            </select>
+                        </div>
+
+
+                        <div class="layui-input-inline layui-show-xs-block">
+                            <button class="layui-btn" lay-submit="" lay-filter="sreach">
+                                <i class="layui-icon">&#xe615;</i></button>
+                        </div>
+                    </form>
+                </div>
+                <div class="layui-card-header">
+
+                    <button class="layui-btn" onclick="xadmin.open('添加用户','/add',800,600)">
+                        <i class="layui-icon"></i>添加</button>
+
+                <button class="layui-btn" th:onclick="export1([[${searchArea}]],[[${searchName}]],[[${searchAddress}]],[[${searchType}]])" href="javascript:;">
+                    <i class="layui-icon"></i>导出表格</button></div>
+                <div class="layui-card-body ">
+                    <table class="layui-table layui-form">
+                        <thead>
+                        <tr>
+
+                            <th>地区</th>
+                            <th>采集源名称</th>
+                            <th>链接地址</th>
+                            <th>监测级别</th>
+                            <th>添加时间</th>
+                            <th>操作</th></tr>
+                        </thead>
+                        <!--<a th:href="@{|/discussPost/detail/${map.post.id}|}-->
+                        <tbody>
+                        <tr  th:each="list:${newsList}">
+
+                            <td th:text="${list.area}"></td>
+                            <td th:text="${list.sourceWebSite}"></td>
+                            <td th:text="${list.sourceInfo}"></td>
+                            <td th:text="${list.level}"></td>
+                            <td th:text="${list.updateTime}"></td>
+                            <td class="td-manage"  th:inline="none">
+                                <a title="查看" th:onclick="xadmin.open('编辑','/collect/edit?id='+[[${list.id}]]+'')" href="javascript:;">
+                                    <i class="layui-icon">&#xe63c;</i></a>
+                                <a title="删除" th:onclick="'javascript:member_del(this,'+${list.id}+')'" href="javascript:;">
+
+                                    <i class="layui-icon">&#xe640;</i></a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="layui-card-body "  th:if="${page.rows>0}"  th:fragment="pagination"><!--th:replace="index::pagination"-->
+                    <div class="page">
+                        <div>
+
+                            <a class="prev" th:href="@{${page.path}(current=1,searchArea=${searchArea},searchName=${searchName},searchAddress=${searchAddress},searchType=${searchType})}">&lt;&lt;</a>
+
+                            <a class="num" th:if= "${page.current != 1}"  th:href="@{${page.path}(current=${page.current-1},searchArea=${searchArea},searchName=${searchName},searchAddress=${searchAddress},searchType=${searchType})}" >上一页</a>
+
+                            <span class="current" th:text="${page.current}">1</span>
+
+                            <a class="num" th:if= "(${page.current} != ${page.total})"  th:href="@{${page.path}(current=${page.current+1},searchArea=${searchArea},searchName=${searchName},searchAddress=${searchAddress},searchType=${searchType})}">下一页</a>
+
+
+                            <a class="next" th:href="@{${page.path}(current=${page.total},searchArea=${searchArea},searchName=${searchName},searchAddress=${searchAddress},searchType=${searchType})}">&gt;&gt;</a></div>
+                                    共&nbsp;<div th:text="${allCount}" style="display: inline"></div>&nbsp;条
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script>layui.use(['laydate', 'form'],
+    function() {
+        var laydate = layui.laydate;
+
+
+    });
+
+/*导出表格*/
+
+function export1(searchArea,searchName,searchAddress,searchType){
+    console.log(searchArea);
+    console.log(searchName);
+    console.log(searchAddress);
+    console.log(searchType);
+
+    window.location.href = "/collect/export?searchArea=" + searchArea + "&searchName=" + searchName + "&searchAddress=" +searchAddress + "&searchType=" +searchType;
+}
+/*用户-删除*/
+function member_del(obj, id) {
+    layer.confirm('确认要删除吗？',
+        function(index) {
+            //发异步删除数据
+
+
+
+            $.get('/collect/delete',{id:id},function (resp) {
+                //console.log(resp);
+                if (resp.success == 1) {
+                    layer.msg("删除成功");
+                    $(obj).parents("tr").remove();
+                } else {
+                    layer.msg("删除失败" + resp.message,{
+                        icon: 1,
+                        time: 1000
+                    });
+                }
+            });
+
+
+
+
+
+
+
+        });
+}
+
+</script>
+
+</html>

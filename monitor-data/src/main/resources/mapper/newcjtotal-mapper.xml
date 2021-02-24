@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.maigechuang.mapper.caiji.NewsCjTotalMapper">
+
+
+    <sql id="search_where">
+
+            <if test="MonitorSearch.search_area != null and MonitorSearch.search_area !=''">
+              and  news.area like '%${MonitorSearch.search_area}%'
+            </if>
+            <if test="MonitorSearch.search_cjname != null and MonitorSearch.search_cjname !=''">
+                and news.source_web_site like '%${MonitorSearch.search_cjname}%'
+            </if>
+            <if test="MonitorSearch.search_url != null and MonitorSearch.search_url !=''">
+                and news.source_info like '%${MonitorSearch.search_url}%'
+            </if>
+
+
+    </sql>
+
+    <select id="findWarningData" resultType="com.maigechuang.entity.vo.WarningInfoVo">
+        select sum(total) as total,SUM(isrest) as temp from [JK2018].[dbo].[news_cj_total]  where tid = #{tid} and cjtime >= #{cjtime}
+
+    </select>
+
+
+    <select id="getTotal" resultType="int">
+        select COUNT(a.a) from (
+        SELECT
+       count(1) as a
+        FROM [JK2018].[dbo].[news_cj_total] mo left join [JK2018].[dbo].[news_source] news on mo.tid = news.id
+        where  (mo.cjtime &gt;= #{startTime} and mo.cjtime &lt; #{endTime})
+        <include refid="search_where" />
+        group by area,source_web_site,source_info,news.id) as a
+    </select>
+
+    <select id="getCjTotalList" parameterType="map" resultType="com.maigechuang.entity.bo.MonitorData">
+        select top (#{limit})
+        z.id,
+        z.area,
+        z.cjname,
+        z.url,
+        z.total
+
+        from(
+
+        SELECT
+        news.id as id,
+        news.area as area,
+        news.source_web_site as cjname,
+        news.source_info as url,
+        sum(mo.total) as total
+
+        FROM [JK2018].[dbo].[news_cj_total] mo left join [JK2018].[dbo].[news_source] news on mo.tid = news.id
+        where  (mo.cjtime &gt;= #{startTime} and mo.cjtime &lt; #{endTime})
+        <include refid="search_where" />
+        group by area,source_web_site,source_info,news.id
+        )  as z  where z.id not in (SELECT top (#{size})
+        news.id as id
+        FROM [JK2018].[dbo].[news_cj_total] mo left join [JK2018].[dbo].[news_source] news on mo.tid = news.id
+        where  (mo.cjtime &gt;= #{startTime} and mo.cjtime &lt; #{endTime})
+        <include refid="search_where" />
+        group by area,source_web_site,source_info,news.id order by sum(mo.total) desc,news.id)
+        order by z.total desc,z.id</select>
+
+    
+    
+    <insert id="insertData" parameterType="com.maigechuang.entity.NewsCjTotal">
+        insert into news_cj_total(tid,total,cjtime) values (#{tid},#{total},#{cjtime});
+    </insert>
+    
+    <select id="findTopList"  resultType="com.maigechuang.entity.NewsCjTotal">
+        SELECT top 5 tid,total FROM news_cj_total  WHERE cjtime  &gt;= #{cjtime} and cjtime &lt; #{endTime} ORDER BY total desc
+    </select>
+
+    <select id="readcountById" resultType="com.maigechuang.entity.bo.ReadData">
+        select CONVERT(varchar(10),GETDATE()-1-#{start},120) as time ,sum(total) as total from [JK2018].[dbo].[news_cj_total]
+
+
+        where (cjtime &lt; CONVERT(varchar(10),GETDATE()-#{start},120) and cjtime &gt;= CONVERT(varchar(10),GETDATE()-#{end},120))
+        and tid = #{tid}
+    </select>
+
+
+<update id="updateIsrestByTid">
+
+    update [JK2018].[dbo].[news_cj_total] set isrest = 1 where tid = #{tid} and cjtime >= #{time}
+
+</update>
+    
+</mapper>

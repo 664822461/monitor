@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.maigechuang.mapper.caiji.MonitorCateMapper">
+
+    <select id="getMonitorValueByLevel" parameterType="com.maigechuang.entity.MonitorCate" resultType="int">
+        select monitor_value from monitor_cate where monitor_level = #{level}
+    </select>
+
+    <select id="getCount"   resultType="int">
+        select count(1) from monitor_cate
+    </select>
+
+    <select id="getGradeData" resultType="com.maigechuang.entity.MonitorCate">
+
+SELECT TOP (7) [id]
+      ,[monitor_level]
+      ,[monitor_value]
+  FROM [JK2018].[dbo].[monitor_cate] where id not in  (select top (#{size}) id from [JK2018].[dbo].[monitor_cate])
+
+
+    </select>
+
+    <update id="updateMonitorValueById" >
+        update [JK2018].[dbo].[monitor_cate] set monitor_value = #{monitorValue} where id = #{id}
+    </update>
+</mapper>

@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.maigechuang.mapper.caiji.NewsSourceMapper">
+
+
+    <sql id="search_where">
+    <where>
+        <if test="newsSearch.searchArea != null and newsSearch.searchArea !=''">
+            area like '%${newsSearch.searchArea}%'
+        </if>
+        <if test="newsSearch.searchName != null and newsSearch.searchName !=''">
+            and source_web_site like '%${newsSearch.searchName}%'
+        </if>
+
+        <if test="newsSearch.searchAddress != null and newsSearch.searchAddress !=''">
+            and source_info like '%${newsSearch.searchAddress}%'
+        </if>
+
+        <if test="newsSearch.searchType != null and newsSearch.searchType !='' and newsSearch.searchType != 0">
+            and type like '%${newsSearch.searchType}%'
+        </if>
+    </where>
+</sql>
+
+    <sql id="search_where3">
+        <where>
+            <if test="searchArea != null and searchArea !=''">
+                area like '%${searchArea}%'
+            </if>
+            <if test="searchName != null and searchName !=''">
+                and source_web_site like '%${searchName}%'
+            </if>
+
+            <if test="searchAddress != null and searchAddress !=''">
+                and source_info like '%${searchAddress}%'
+            </if>
+
+            <if test="searchType != null and searchType !='' and searchType != 0">
+                and type like '%${searchType}%'
+            </if>
+        </where>
+    </sql>
+
+    <sql id="insertFields">
+        source_web_site, source_info, area, update_time, status, type, level
+    </sql>
+
+
+    <sql id="search_where2">
+
+            <if test="newsSearch.searchArea != null and newsSearch.searchArea !=''">
+               and area like '%${newsSearch.searchArea}%'
+            </if>
+            <if test="newsSearch.searchName != null and newsSearch.searchName !=''">
+                and source_web_site like '%${newsSearch.searchName}%'
+            </if>
+
+            <if test="newsSearch.searchAddress != null and newsSearch.searchAddress !=''">
+                and source_info like '%${newsSearch.searchAddress}%'
+            </if>
+            <if test="newsSearch.searchType != null and newsSearch.searchType !='' and newsSearch.searchType != 0">
+                and type like '%${newsSearch.searchType}%'
+            </if>
+
+    </sql>
+
+
+
+    <sql id = "selectFields">
+        id,source_web_site, source_info, area,update_time , status, type, level
+    </sql>
+
+
+
+
+    <select id="getAllNews"  parameterType="com.maigechuang.entity.NewsSource" resultType="com.maigechuang.entity.vo.ExportNewsSourceVo">
+        /****** Script for SelectTopNRows command from SSMS  ******/
+        SELECT
+        n.area as area
+        ,n.source_web_site as sourceWebSite
+        ,n.source_info as sourceInfo
+        ,n.update_time as updateTime
+        ,f.category_value as categoryValue
+        ,n.level as monlevel
+        FROM [JK2018].[dbo].[news_source] n left join [JK2018].[dbo].[category] f
+        on n.type = f.category_num
+        <include refid="search_where3"></include>
+        order by
+        categoryValue
+    </select>
+
+
+<select id="findNewsByName" resultType="com.maigechuang.entity.NewsSource">
+    select id from news_source where source_web_site = #{name}
+</select>
+
+
+    <update id="updateNews" parameterType="com.maigechuang.entity.NewsSource">
+        update  news_source set source_web_site = #{sourceWebSite},source_info = #{sourceInfo},
+        area = #{area},type = #{type},level = #{level} where id = #{id}
+
+    </update>
+
+
+<select id="getAllCount" resultType="int">
+
+    SELECT count(1) from  news_source
+</select>
+
+    <select id="getCountByDate" resultType="int">
+        SELECT count(1) from  news_source where update_time &gt;= #{startTime} and update_time &lt; #{endTime}
+    </select>
+
+    <select id = "getNewsCount" resultType="int" parameterType="map">
+        select count(1)
+        from news_source <include refid="search_where"></include>
+    </select>
+
+   <!-- <select id = "getNewsList" resultType="com.maigechuang.entity.NewsSource" parameterType="map">
+        select top (#{limit}) <include refid="selectFields"></include>
+        from news_source where id not in (select top (#{size}) id from news_source <include refid="search_where"></include>)
+        <include refid="search_where2"></include>
+    </select>
+-->
+
+    <select id = "getNewsList" resultType="com.maigechuang.entity.NewsSource" parameterType="map">
+        select top (#{limit}) <include refid="selectFields"></include>
+        from news_source where id >
+        (
+        select  ISNULL(MAX(id),0) from (
+        select top (#{size}) id from [JK2018].[dbo].[news_source] <include refid="search_where"></include> order by id
+        )as a
+        )  <include refid="search_where2"></include>  order by id
+
+    </select>
+
+
+
+    <delete id="deletenewsById" parameterType="int">
+        delete from news_source where id = #{id}
+    </delete>
+
+
+
+    <select id = "getNameList" resultType="com.maigechuang.entity.NewsSource">
+        select id,source_web_site,level
+        from news_source
+    </select>
+
+
+    <select id="findNewsById" resultType="com.maigechuang.entity.NewsSource">
+        select  <include refid="selectFields"></include>
+         from news_source where id = #{id}
+    </select>
+
+    <insert id="insertNews" parameterType="com.maigechuang.entity.NewsSource" >
+        insert into news_source (<include refid="insertFields"></include>)
+        values (#{sourceWebSite},#{sourceInfo},#{area},#{updateTime},#{status},#{type},#{level})
+    </insert>
+
+
+    <select id = "getaddtotal" resultType="com.maigechuang.entity.bo.CaijiTotal">
+
+        select CONVERT(varchar(10),GETDATE()-1-#{start},120) as date ,COUNT(1) as total from [JK2018].[dbo].[news_source]
+        where update_time &lt; CONVERT(varchar(10),GETDATE()-#{start},120) and update_time &gt;= CONVERT(varchar(10),GETDATE()-#{end},120)
+
+    </select>
+
+    <select id="findtest" resultType="com.maigechuang.entity.NewsSource">
+        select  <include refid="selectFields"></include>   from news_source where id >= 278
+    </select>
+
+</mapper>

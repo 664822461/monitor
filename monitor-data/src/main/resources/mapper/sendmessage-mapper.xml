@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.maigechuang.mapper.jk.SendMessageMapper">
+
+
+    <sql id = "selectFields">
+        SourceCount,ProvanceCount, InvalidCount,IsSend,UpdatedTime,AllCount, ValidCount
+    </sql>
+
+    <select id="getMessageList" resultType="com.maigechuang.entity.SendMessage">
+
+        select top (#{limit}) <include refid="selectFields"></include>
+        from [JK].[dbo].[SendMessage] where Id not in (select top (#{size}) Id from [JK].[dbo].[SendMessage]  order by Id desc)
+         order by Id desc
+    </select>
+
+    <select id="getCount" resultType="int">
+
+        select count(1)
+        from [JK].[dbo].[SendMessage]
+
+    </select>
+
+</mapper>
